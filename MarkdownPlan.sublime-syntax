@@ -1,0 +1,50 @@
+%YAML 1.2
+---
+name: MarkdownPlan
+file_extensions: [plan.md]
+scope: text.html.markdown
+
+contexts:
+  main:
+    - match: "[\\s^\n]*-"
+      embed: task
+      escape: "\n"
+    - match: "[\\s^\n]*(#{1}) "
+      captures:
+        1: punctuation.definition.heading.begin.markdown
+      embed: task
+      embed_scope: markup.heading.1.markdown
+      escape: \n
+    - match: "[\\s^\n]*(#{2}) "
+      captures:
+        1: punctuation.definition.heading.begin.markdown
+      embed: task
+      embed_scope: markup.heading.1.markdown
+      escape: \n
+    - match: "[\\s^\n]*(#{3}) "
+      captures:
+        1: punctuation.definition.heading.begin.markdown
+      embed: task
+      embed_scope: markup.heading.1.markdown
+      escape: \n
+    - match: "- "
+      embed: task
+      escape: \n
+
+  task:
+    - match: \[
+      push: brackets
+    - match: "@\\("
+      push: dependencies
+
+  brackets:
+    - meta_scope: punctuation.definition.link.begin.markdown
+    - match: \b(by|wait|started)\b
+      scope: keyword.control.c
+    - match: \]
+      pop: true
+
+  dependencies:
+    - meta_scope: string.quoted.double.c
+    - match: \)
+      pop: true
