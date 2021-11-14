@@ -2,6 +2,8 @@ import sublime
 import sublime_plugin
 
 import re
+task_regex = r'''^( *|\t*)(-|\*|[1-9][0-9]*\.|#{1,6}) '''
+estimate_pattern = re.compile(r'''\[\.{1,3}\]''')
 measurement_pattern = re.compile(r'''\[[ahd\s,]+\]''')
 
 CHAR_TO_HOURS = {
@@ -41,23 +43,27 @@ class MdplanEventListener(sublime_plugin.ViewEventListener):
 		return 'MarkdownPlan' in settings.get('syntax')
 
 	def set_status(self):
+
 		# find estimates and their corresponding measurements
-		regions = self.view.find_all(r'''\[\.{1,3}\]''')
+		regions = self.view.find_all(task_regex)
 		total = 0
 		for region in regions:
-			dots = self.view.substr(region).count('.')
-			remaining = DOTS_TO_HOURS[dots]
 			line = self.view.substr(self.view.line(region.a))
-			# check for measurements
-			match = measurement_pattern.search(line)
-			if match:
-				completed = 0
-				for c in match.group(0):
-					completed += CHAR_TO_HOURS.get(c, 0)
-				remaining = max(remaining - completed, 0)
-			total += remaining
-		printout = printout_for(total)
-		self.view.set_status("markdown-plan", "remaining: "+printout)
+			estimate = estimate_pattern.search(line)
+			if estimate:
+				dots = estimate.group(0)
+				remaining = DOTS_TO_HOURS[dots.count('.')]
+				# check for measurements
+				match = measurement_pattern.search(line)
+				if match:
+					completed = 0
+					for c in match.group(0):
+						completed += CHAR_TO_HOURS.get(c, 0)
+					remaining = max(remaining - completed, 0)
+				total += remaining
+
+		# print a summary on the status bar
+		self.view.set_status("markdown-plan", "remaining: "+printout_for(total))
 
 	def on_modified(self):
 		self.set_status()

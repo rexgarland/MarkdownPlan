@@ -7,6 +7,8 @@ scope: text.html.markdown
 contexts:
   main:
     - match: "^( *|\\t*)(-|\\*) "
+      captures:
+        2: punctuation.definition.heading.begin.markdown
       embed: task
       escape: "\n"
     - match: "^( *|\\t*)([1-9][0-9]*\\.) "
