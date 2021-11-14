@@ -6,7 +6,7 @@ scope: text.html.markdown
 
 contexts:
   main:
-    - match: "[\\s^\n]*-"
+    - match: "[\\s^\n]*(-|*|[1-9][0-9]*\\.)"
       embed: task
       escape: "\n"
     - match: "[\\s^\n]*(#{1}) "
