@@ -4,30 +4,35 @@ import sublime_plugin
 import re
 measurement_pattern = re.compile(r'''\[[ahd\s,]+\]''')
 
-DOTS_TO_DAYS = {
-	1: 0.5,
-	2: 2,
-	3: 7
+CHAR_TO_HOURS = {
+	'h': 1,
+	'a': 4,
+	'd': 8
 }
 
-CHAR_TO_DAYS = {
-	'h': 0.125,
-	'a': 0.5,
-	'd': 1
+DOTS_TO_HOURS = {
+	1: 4,
+	2: 2*8,
+	3: 7*8
 }
 
-def printout_for(days):
+def printout_for(hours):
 	# create printout
-	months = days//30
-	days -= months*30
-	weeks = days//7
-	days -= weeks*7
+	months = int(hours//(30*8))
+	hours -= months*(30*8)
+	weeks = int(hours//(7*8))
+	hours -= weeks*(7*8)
+	days = int(hours//8)
+	hours -= days*8
 	text = ""
 	if months>0:
-		text += str(int(months))+"m"
+		text += str(months)+"m"
 	if weeks>0:
-		text += str(int(weeks))+"w"
-	text += str(days)+"d"
+		text += str(weeks)+"w"
+	if days>0:
+		text += str(days)+"d"
+	if hours>0:
+		text += str(hours)+"h"
 	return text
 
 class MdplanEventListener(sublime_plugin.ViewEventListener):
@@ -41,14 +46,14 @@ class MdplanEventListener(sublime_plugin.ViewEventListener):
 		total = 0
 		for region in regions:
 			dots = self.view.substr(region).count('.')
-			remaining = DOTS_TO_DAYS[dots]
+			remaining = DOTS_TO_HOURS[dots]
 			line = self.view.substr(self.view.line(region.a))
 			# check for measurements
 			match = measurement_pattern.search(line)
 			if match:
 				completed = 0
 				for c in match.group(0):
-					completed += CHAR_TO_DAYS.get(c, 0)
+					completed += CHAR_TO_HOURS.get(c, 0)
 				remaining = max(remaining - completed, 0)
 			total += remaining
 		printout = printout_for(total)
