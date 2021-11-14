@@ -2,7 +2,7 @@
 ---
 name: MarkdownPlan
 file_extensions: [plan.md]
-scope: text.html.markdown
+scope: source.mdplan
 
 contexts:
   main:

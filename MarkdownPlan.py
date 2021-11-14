@@ -1,8 +1,12 @@
 import sublime
 import sublime_plugin
 
+BLOCK_QUOTE_LINE_PREFIX = '> '
+
 import re
+
 task_regex = r'''^( *|\t*)(-|\*|[1-9][0-9]*\.|#{1,6}) '''
+task_regex_with_block_comments = '^('+BLOCK_QUOTE_LINE_PREFIX+r''')*( *|\t*)(-|\*|[1-9][0-9]*\.|#{1,6}) '''
 estimate_pattern = re.compile(r'''\[\.{1,3}\]''')
 measurement_pattern = re.compile(r'''\[[ahd\s,]+\]''')
 
@@ -73,3 +77,25 @@ class MdplanEventListener(sublime_plugin.ViewEventListener):
 
 	def on_reload(self):
 		self.set_status()
+
+class MdplanCommentCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		# get the starting points of all lines intersecting the selection
+		task_line_points = set()
+		for region in self.view.sel():
+			for line in self.view.lines(region):
+				point = line.begin()
+				# check if the point is a task line
+				if re.match(task_regex_with_block_comments, self.view.substr(self.view.line(point))):
+					task_line_points.add(point)
+		# order the task_line_points
+		task_line_points = sorted(list(task_line_points), reverse=True)
+		# determine if toggle comment should create or remove comments
+		if all(self.view.substr(sublime.Region(point,point+2))==BLOCK_QUOTE_LINE_PREFIX for point in task_line_points):
+			# remove comments
+			for point in task_line_points:
+				self.view.erase(edit, sublime.Region(point,point+2))
+		else:
+			# insert a block quote character at the beginning of each line
+			for point in task_line_points:
+				self.view.insert(edit, point, BLOCK_QUOTE_LINE_PREFIX)

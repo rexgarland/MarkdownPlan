@@ -1,0 +1,11 @@
+[
+	{
+		"keys": ["command+/"], 
+		"command": "mdplan_comment", 
+		"context": [{
+			"key": "selector",
+			"operator": "equal",
+			"operand": "source.mdplan"
+		}],
+	},
+]
