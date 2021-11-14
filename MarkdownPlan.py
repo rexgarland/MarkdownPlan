@@ -28,11 +28,11 @@ def printout_for(hours):
 	if months>0:
 		text += str(months)+"m"
 	if weeks>0:
-		text += str(weeks)+"w"
+		text += " "+str(weeks)+"w"
 	if days>0:
-		text += str(days)+"d"
+		text += " "+str(days)+"d"
 	if hours>0:
-		text += str(hours)+"h"
+		text += " "+str(hours)+"h"
 	return text
 
 class MdplanEventListener(sublime_plugin.ViewEventListener):
