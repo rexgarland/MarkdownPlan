@@ -34,6 +34,10 @@ contexts:
       embed: task
       embed_scope: markup.heading.1.markdown
       escape: \n
+    - match: "^> "
+      push: comment
+    - match: "```"
+      push: block_comment
 
   task:
     - match: \[
@@ -51,4 +55,14 @@ contexts:
   dependencies:
     - meta_scope: string.quoted.double.c
     - match: \)
+      pop: true
+
+  comment:
+    - meta_scope: comment
+    - match: "\n"
+      pop: true
+
+  block_comment:
+    - meta_scope: comment
+    - match: "```"
       pop: true

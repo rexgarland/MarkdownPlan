@@ -23,6 +23,8 @@ DOTS_TO_HOURS = {
 }
 
 def printout_for(hours):
+	if hours==0:
+		return "0h"
 	# create printout
 	months = int(hours//(30*8))
 	hours -= months*(30*8)
