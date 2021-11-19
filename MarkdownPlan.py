@@ -87,8 +87,10 @@ class MdplanCommentCommand(sublime_plugin.TextCommand):
 		for region in self.view.sel():
 			for line in self.view.lines(region):
 				point = line.begin()
+				line = self.view.substr(self.view.line(point))
 				# check if the point is a task line
-				if re.match(task_regex_with_block_comments, self.view.substr(self.view.line(point))):
+				# if re.match(task_regex_with_block_comments, line):
+				if line.strip():
 					task_line_points.add(point)
 		# order the task_line_points
 		task_line_points = sorted(list(task_line_points), reverse=True)
