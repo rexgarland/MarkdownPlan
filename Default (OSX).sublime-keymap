@@ -5,7 +5,8 @@
 		"context": [{
 			"key": "selector",
 			"operator": "equal",
-			"operand": "source.mdplan"
+			// "operand": "source.mdplan"
+			"operand": "text.html.markdown.markdownplan"
 		}],
 	},
 ]

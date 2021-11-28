@@ -2,7 +2,7 @@
 ---
 name: MarkdownPlan
 file_extensions: [plan.md]
-scope: source.mdplan
+scope: text.html.markdown.markdownplan
 
 contexts:
   main:
@@ -26,24 +26,32 @@ contexts:
       captures:
         2: punctuation.definition.heading.begin.markdown
       embed: task
-      embed_scope: markup.heading.1.markdown
+      embed_scope: markup.heading.2.markdown
       escape: \n
     - match: "^( *|\\t*)(#{3}) "
       captures:
         2: punctuation.definition.heading.begin.markdown
       embed: task
-      embed_scope: markup.heading.1.markdown
+      embed_scope: markup.heading.3.markdown
       escape: \n
     - match: "^> "
       push: comment
     - match: "```"
       push: block_comment
+    - match: "`"
+      push: inline_comment
 
   task:
     - match: \[
       push: brackets
     - match: "@\\("
       push: dependencies
+    - match: "```"
+      push: block_comment
+    - match: "`"
+      push: inline_comment
+    - match: "\\("
+      push: in_parens
 
   brackets:
     - meta_scope: punctuation.definition.link.begin.markdown
@@ -65,4 +73,13 @@ contexts:
   block_comment:
     - meta_scope: comment
     - match: "```"
+      pop: true
+
+  inline_comment:
+    - meta_scope: comment
+    - match: "`"
+      pop: true
+
+  in_parens:
+    - match: "\\)"
       pop: true
